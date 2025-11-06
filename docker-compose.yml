@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    container_name: astro-postgres
+    environment:
+      POSTGRES_DB: astrodb
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres123
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - astro-network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: astro-backend
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/astrodb
+      DB_USERNAME: postgres
+      DB_PASSWORD: postgres123
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - astro-network
+
+volumes:
+  postgres_data:
+
+networks:
+  astro-network:
+    driver: bridge
