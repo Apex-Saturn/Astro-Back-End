@@ -4,6 +4,8 @@ plugins {
     kotlin("jvm") version "1.9.25"
     kotlin("plugin.spring") version "1.9.25"
     kotlin("plugin.jpa") version "1.9.25"
+    id("org.jlleitschuh.gradle.ktlint") version "12.1.0"
+    id("io.gitlab.arturbosch.detekt") version "1.23.4"
 }
 
 group = "com.fara7"
@@ -47,6 +49,7 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
     runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5")
+    testImplementation("com.h2database:h2")
 
     developmentOnly("org.springframework.boot:spring-boot-devtools")
 
@@ -66,4 +69,13 @@ kotlin {
 
 tasks.withType<Test> {
     useJUnitPlatform()
+}
+configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+    version.set("1.0.1")
+    android.set(false)
+}
+
+detekt {
+    config.setFrom("$projectDir/config/detekt.yml")
+    buildUponDefaultConfig = true
 }
